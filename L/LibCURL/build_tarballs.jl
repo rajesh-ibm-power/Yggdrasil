@@ -15,6 +15,12 @@ sources = [
 script = raw"""
 cd $WORKSPACE/srcdir/curl-*
 
+# Work around missing library:
+# `Error loading shared library libmbedcrypto.so.5: No such file or directory (needed by /workspace/destdir/lib/libssh2.so.1)`
+if [[ ${target} == x86_64-linux-musl ]]; then
+   ln -s libmbedcrypto.so ${WORKSPACE}/destdir/lib/libmbedcrypto.so.5
+fi
+
 # Holy crow we really configure the bitlets out of this thing
 FLAGS=(
     # Disable....almost everything
