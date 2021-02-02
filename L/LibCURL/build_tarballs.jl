@@ -1,6 +1,6 @@
 # Note that this script can accept some limited command-line arguments, run
 # `julia build_tarballs.jl --help` to see a usage message.
-using BinaryBuilder
+using BinaryBuilder, Pkg
 
 name = "LibCURL"
 version = v"7.73.0"
@@ -14,12 +14,6 @@ sources = [
 # Bash recipe for building across all platforms
 script = raw"""
 cd $WORKSPACE/srcdir/curl-*
-
-# Work around missing library:
-# `Error loading shared library libmbedcrypto.so.5: No such file or directory (needed by /workspace/destdir/lib/libssh2.so.1)`
-if [[ ${target} == x86_64-linux-musl ]]; then
-   ln -s libmbedcrypto.so ${WORKSPACE}/destdir/lib/libmbedcrypto.so.5
-fi
 
 # Holy crow we really configure the bitlets out of this thing
 FLAGS=(
@@ -81,7 +75,7 @@ dependencies = [
     Dependency("nghttp2_jll"),
     # Note that while we unconditionally list MbedTLS as a dependency,
     # we default to schannel/SecureTransport on Windows/MacOS.
-    Dependency("MbedTLS_jll"),
+    Dependency(Pkg.Types.PackageSpec(name="MbedTLS_jll", version=v"2.24.0")),
 ]
 
 # Build the tarballs, and possibly a `build.jl` as well.
